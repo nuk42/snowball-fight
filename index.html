@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>눈싸움</title>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes">
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+	height: 100dvh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+      #unity-canvas {
+        width: 100%;
+        height: 100%;
+        max-width: 450px;
+        max-height: 1000px;
+        background: #231F20;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <script src="Build/Build.loader.js"></script>
+    <script>
+      let unityInstance;
+
+      function updateGameResolution() {
+        var canvas = document.getElementById("unity-canvas");
+        var rect = canvas.getBoundingClientRect();
+
+        var scaleFactor = 3;
+        var adjustedWidth = Math.round(rect.width * scaleFactor);
+        var adjustedHeight = Math.round(rect.height * scaleFactor);
+
+        canvas.width = adjustedWidth;
+        canvas.height = adjustedHeight;
+
+        if (unityInstance) {
+          let sizeData = JSON.stringify({ x: adjustedWidth, y: adjustedHeight });
+          unityInstance.SendMessage("WebGLInterop", "UpdateGameResolution", sizeData);
+        }
+      }
+
+      window.addEventListener("resize", updateGameResolution);
+      window.addEventListener("load", updateGameResolution);
+
+      createUnityInstance(document.querySelector("#unity-canvas"), {
+        arguments: [],
+        dataUrl: "Build/Build.data",
+        frameworkUrl: "Build/Build.framework.js",
+        codeUrl: "Build/Build.wasm",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "mafia",
+        productName: "Snowball Fight",
+        productVersion: "1.0",
+        matchWebGLToCanvasSize: false
+      }).then(instance => {
+        unityInstance = instance;
+        updateGameResolution();
+      });
+    </script>
+  </body>
+</html>
